@@ -2,6 +2,7 @@ name: Build and Push GHCR Images
 
 on:
   push:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -10,21 +11,18 @@ permissions:
 jobs:
   build-and-push:
     name: Build & push (${{ matrix.image }})
-    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref_name != github.event.repository.default_branch) || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push') }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         include:
-          - image: uuid-service 
+          - image: uuid-service
             context: ./uuid-service
             dockerfile: ./Dockerfile
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -40,9 +38,10 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/git47829/${{ matrix.image }}
+          images: ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}
           tags: |
             type=sha,format=long
+            type=ref,event=branch
             type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and push image
