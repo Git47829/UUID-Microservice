@@ -1,0 +1,24 @@
+# Env
+.env
+
+# SQLite database
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Go build artifacts
+/UaaS
+/main
+*.exe
+*.test
+*.out
+
+# Vendor
+/vendor/
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+.DS_Store
